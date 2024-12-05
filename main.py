@@ -65,7 +65,25 @@ class Player(object):
         self.rotated_rect.center = (self.x, self.y)
         self.cos = math.cos(math.radians(self.angle + 90))
         self.sin = math.sin(math.radians(self.angle + 90))
-        self.head = (self.x + self.cos * self.width // 2, self.y - self.sin * self.height // 2)        
+        self.head = (self.x + self.cos * self.width // 2, self.y - self.sin * self.height // 2)
+
+    # to-do: implement braking mechanics + forward momentum (the player will still continue to move with reduced momentum after "stopping")
+    #def brake(self):
+     #   pass
+
+    def update_location(self):
+        if self.x > screen_width + 50:
+            self.x = 0
+
+        elif self.x < 0 - self.width:
+            self.x = screen_width
+
+        elif self.y < -50:
+            self.y = screen_height
+
+        elif self.y > screen_height + 50:
+            self.y = 0
+
 
 class Bullet(object):
     def __init__(self):
@@ -84,13 +102,13 @@ class Bullet(object):
         self.x += self.x_velocity
         self.y -= self.y_velocity
 
-    def check_offscreen(self):
-        if self.x < -50 or self.x > screen_width or self.y > self.height or self.y < -50:
-            return True
-
     def draw(self, window):
         pygame.draw.rect(window, (255, 255, 255), [self.x, self.y, self.width, self.height])
-    
+
+    def check_offscreen(self):
+        if self.x < -50 or self.x > screen_width or self.y > screen_height or self.y < -50:
+            return True
+        
 def redrawGameWindow():
     window.blit(bg, (0,0))
     player.draw(window)
@@ -107,10 +125,12 @@ running = True
 while running:
     clock.tick(60)
     if not game_over:
+        player.update_location()
+        
         for bullet in player_bullets:
             bullet.move()
             if bullet.check_offscreen():
-                player_bullets.pop(player_bullets.index(bullet))
+               player_bullets.pop(player_bullets.index(bullet))
 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
