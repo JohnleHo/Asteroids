@@ -191,6 +191,26 @@ while running:
                    bullet.x + bullet.width >= asteroid.x and bullet.x + bullet.width <= asteroid.x + asteroid.width:
                     if bullet.y >= asteroid.y and bullet.y <= asteroid.y + asteroid.height or \
                        bullet.y + bullet.height >= asteroid.y and bullet.y + bullet.height <= asteroid.y + asteroid.height:
+                        if asteroid.size == 3:
+                            new_asteroid_1 = Asteroid(2)
+                            new_asteroid_2 = Asteroid(2)
+
+                            new_asteroid_1.x, new_asteroid_1.y = asteroid.x, asteroid.y
+                            new_asteroid_2.x, new_asteroid_2.y = asteroid.x, asteroid.y
+
+                            asteroids.append(new_asteroid_1)
+                            asteroids.append(new_asteroid_2)
+
+                        elif asteroid.size == 2:
+                            new_asteroid_1 = Asteroid(1)
+                            new_asteroid_2 = Asteroid(1)
+
+                            new_asteroid_1.x, new_asteroid_1.y = asteroid.x, asteroid.y
+                            new_asteroid_2.x, new_asteroid_2.y = asteroid.x, asteroid.y
+
+                            asteroids.append(new_asteroid_1)
+                            asteroids.append(new_asteroid_2)
+
                         asteroids.pop(asteroids.index(asteroid))
                         player_bullets.pop(player_bullets.index(bullet))
 
