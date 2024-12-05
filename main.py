@@ -147,7 +147,6 @@ class Asteroid(object):
 
     def draw(self, window):
         window.blit(self.image, (self.x, self.y))
-
         
 def redrawGameWindow():
     window.blit(bg, (0,0))
@@ -165,88 +164,92 @@ def redrawGameWindow():
     window.blit(lives_text, (25, 25))
     pygame.display.update()
 
-player = Player()
-player_bullets = []
+def main():
+    player = Player()
+    player_bullets = []
 
-asteroids = []
-count = 0
+    asteroids = []
+    count = 0
 
-running = True
-while running:
-    clock.tick(60)
-    count += 1
+    running = True
+    while running:
+        clock.tick(60)
+        count += 1
 
-    if not game_over:
-        if count % 50 == 0:
-            ran = random.choice([1, 1, 1, 2, 2, 3])
-            asteroids.append(Asteroid(ran))
+        if not game_over:
+            if count % 50 == 0:
+                ran = random.choice([1, 1, 1, 2, 2, 3])
+                asteroids.append(Asteroid(ran))
 
-        player.update_location()
-        
-        for bullet in player_bullets:
-            bullet.move()
-            if bullet.check_offscreen():
-               player_bullets.pop(player_bullets.index(bullet))
-
-        for asteroid in asteroids:
-            asteroid.x += asteroid.x_velocity
-            asteroid.y += asteroid.y_velocity
-
-            if (player.x >= asteroid.x and player.x <= asteroid.x + asteroid.width) or \
-               (player.x + player.width >= asteroid.x and player.x + player.width <= asteroid.x + asteroid.width):
-                if (player.y >= asteroid.y and player.y <= asteroid.y + asteroid.height) or \
-                (player.y + player.height >= asteroid.y and player.y + player.height <= asteroid.y + asteroid.height):
-                    lives -= 1
-                    asteroids.pop(asteroids.index(asteroid))
-                    break
-
+            player.update_location()
+            
             for bullet in player_bullets:
-                if bullet.x >= asteroid.x and bullet.x <= asteroid.x + asteroid.width or \
-                   bullet.x + bullet.width >= asteroid.x and bullet.x + bullet.width <= asteroid.x + asteroid.width:
-                    if bullet.y >= asteroid.y and bullet.y <= asteroid.y + asteroid.height or \
-                       bullet.y + bullet.height >= asteroid.y and bullet.y + bullet.height <= asteroid.y + asteroid.height:
-                        if asteroid.size == 3:
-                            new_asteroid_1 = Asteroid(2)
-                            new_asteroid_2 = Asteroid(2)
+                bullet.move()
+                if bullet.check_offscreen():
+                player_bullets.pop(player_bullets.index(bullet))
 
-                            new_asteroid_1.x, new_asteroid_1.y = asteroid.x, asteroid.y
-                            new_asteroid_2.x, new_asteroid_2.y = asteroid.x, asteroid.y
+            for asteroid in asteroids:
+                asteroid.x += asteroid.x_velocity
+                asteroid.y += asteroid.y_velocity
 
-                            asteroids.append(new_asteroid_1)
-                            asteroids.append(new_asteroid_2)
-
-                        elif asteroid.size == 2:
-                            new_asteroid_1 = Asteroid(1)
-                            new_asteroid_2 = Asteroid(1)
-
-                            new_asteroid_1.x, new_asteroid_1.y = asteroid.x, asteroid.y
-                            new_asteroid_2.x, new_asteroid_2.y = asteroid.x, asteroid.y
-
-                            asteroids.append(new_asteroid_1)
-                            asteroids.append(new_asteroid_2)
-
+                if (player.x >= asteroid.x and player.x <= asteroid.x + asteroid.width) or \
+                (player.x + player.width >= asteroid.x and player.x + player.width <= asteroid.x + asteroid.width):
+                    if (player.y >= asteroid.y and player.y <= asteroid.y + asteroid.height) or \
+                    (player.y + player.height >= asteroid.y and player.y + player.height <= asteroid.y + asteroid.height):
+                        lives -= 1
                         asteroids.pop(asteroids.index(asteroid))
-                        player_bullets.pop(player_bullets.index(bullet))
+                        break
 
-        if lives <= 0:
-            game_over = True
+                for bullet in player_bullets:
+                    if bullet.x >= asteroid.x and bullet.x <= asteroid.x + asteroid.width or \
+                    bullet.x + bullet.width >= asteroid.x and bullet.x + bullet.width <= asteroid.x + asteroid.width:
+                        if bullet.y >= asteroid.y and bullet.y <= asteroid.y + asteroid.height or \
+                        bullet.y + bullet.height >= asteroid.y and bullet.y + bullet.height <= asteroid.y + asteroid.height:
+                            if asteroid.size == 3:
+                                new_asteroid_1 = Asteroid(2)
+                                new_asteroid_2 = Asteroid(2)
 
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-            player.turn_left()
-        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-            player.turn_right()
-        if keys[pygame.K_UP] or keys[pygame.K_w]:
-            player.move_forward()
+                                new_asteroid_1.x, new_asteroid_1.y = asteroid.x, asteroid.y
+                                new_asteroid_2.x, new_asteroid_2.y = asteroid.x, asteroid.y
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+                                asteroids.append(new_asteroid_1)
+                                asteroids.append(new_asteroid_2)
 
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                if not game_over:
-                    player_bullets.append(Bullet())
+                            elif asteroid.size == 2:
+                                new_asteroid_1 = Asteroid(1)
+                                new_asteroid_2 = Asteroid(1)
 
-    redrawGameWindow()
-pygame.quit()
+                                new_asteroid_1.x, new_asteroid_1.y = asteroid.x, asteroid.y
+                                new_asteroid_2.x, new_asteroid_2.y = asteroid.x, asteroid.y
+
+                                asteroids.append(new_asteroid_1)
+                                asteroids.append(new_asteroid_2)
+
+                            asteroids.pop(asteroids.index(asteroid))
+                            player_bullets.pop(player_bullets.index(bullet))
+
+            if lives <= 0:
+                game_over = True
+
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+                player.turn_left()
+            if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+                player.turn_right()
+            if keys[pygame.K_UP] or keys[pygame.K_w]:
+                player.move_forward()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    if not game_over:
+                        player_bullets.append(Bullet())
+
+        redrawGameWindow()
+    pygame.quit()
+
+if __name__ == "__main__":
+    main()
