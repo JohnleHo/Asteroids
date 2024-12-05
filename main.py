@@ -2,6 +2,8 @@ import pygame
 import math
 import random
 
+pygame.font.init()
+
 screen_width = 800
 screen_height = 800
 
@@ -18,6 +20,7 @@ window = pygame.display.set_mode((screen_width, screen_height))
 clock = pygame.time.Clock()
 
 game_over = False
+lives = 3
 
 class Player(object):
     def __init__(self):
@@ -37,7 +40,6 @@ class Player(object):
         self.head = (self.x + self.cos * self.width // 2, self.y - self.sin * self.height // 2)
 
     def draw(self, window):
-        #window.blit(self.img, [self.x, self.y, self.width, self.height])
         window.blit(self.rotated_surf, self.rotated_rect)
 
     def turn_left(self):
@@ -149,6 +151,9 @@ class Asteroid(object):
         
 def redrawGameWindow():
     window.blit(bg, (0,0))
+    font = pygame.font.SysFont('arial', 30)
+    lives_text = font.render('Lives: ' + str(lives), 1, (255, 255, 255))
+
     player.draw(window)
 
     for asteroid in asteroids:
@@ -157,6 +162,7 @@ def redrawGameWindow():
     for bullet in player_bullets:
         bullet.draw(window)
 
+    window.blit(lives_text, (25, 25))
     pygame.display.update()
 
 player = Player()
@@ -186,6 +192,14 @@ while running:
             asteroid.x += asteroid.x_velocity
             asteroid.y += asteroid.y_velocity
 
+            if (player.x >= asteroid.x and player.x <= asteroid.x + asteroid.width) or \
+               (player.x + player.width >= asteroid.x and player.x + player.width <= asteroid.x + asteroid.width):
+                if (player.y >= asteroid.y and player.y <= asteroid.y + asteroid.height) or \
+                (player.y + player.height >= asteroid.y and player.y + player.height <= asteroid.y + asteroid.height):
+                    lives -= 1
+                    asteroids.pop(asteroids.index(asteroid))
+                    break
+
             for bullet in player_bullets:
                 if bullet.x >= asteroid.x and bullet.x <= asteroid.x + asteroid.width or \
                    bullet.x + bullet.width >= asteroid.x and bullet.x + bullet.width <= asteroid.x + asteroid.width:
@@ -213,6 +227,9 @@ while running:
 
                         asteroids.pop(asteroids.index(asteroid))
                         player_bullets.pop(player_bullets.index(bullet))
+
+        if lives <= 0:
+            game_over = True
 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
