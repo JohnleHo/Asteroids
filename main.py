@@ -1,5 +1,6 @@
 import pygame
 import math
+import random
 
 screen_width = 800
 screen_height = 800
@@ -84,7 +85,6 @@ class Player(object):
         elif self.y > screen_height + 50:
             self.y = 0
 
-
 class Bullet(object):
     def __init__(self):
         self.point = player.head
@@ -109,9 +109,50 @@ class Bullet(object):
         if self.x < -50 or self.x > screen_width or self.y > screen_height or self.y < -50:
             return True
         
+class Asteroid(object):
+    def __init__(self, size):
+        self.size = size
+        if self.size == 1:
+            self.image = asteroid_small
+
+        elif self.size == 2:
+            self.image = asteroid_med
+
+        elif self.size == 3:
+            self.image = asteroid_lrg
+
+        self.width = 50 * size
+        self.height = 50 * size
+        self.random_point = random.choice([(random.randrange(0, screen_width - self.width), 
+                                            random.choice([-1 * self.height - 5, screen_height + 5])),
+                                            (random.choice([-1 * self.width - 5, screen_width + 5]),
+                                            random.randrange(0, screen_height - self.height))])
+        
+        self.x, self.y = self.random_point
+
+        if self.x < screen_width // 2:
+            self.xdir = 1
+        else:
+            self.xdir = -1
+
+        if self.y < screen_height // 2:
+            self.ydir = 1
+        else:
+            self.ydir = -1
+
+        self.x_velocity = self.xdir * random.randrange(1, 3)
+        self.y_velocity = self.ydir * random.randrange(1, 3)
+
+    def draw(self, window):
+        window.blit(self.image, (self.x, self.y))
+
+        
 def redrawGameWindow():
     window.blit(bg, (0,0))
     player.draw(window)
+
+    for asteroid in asteroids:
+        asteroid.draw(window)
     
     for bullet in player_bullets:
         bullet.draw(window)
@@ -121,16 +162,29 @@ def redrawGameWindow():
 player = Player()
 player_bullets = []
 
+asteroids = []
+count = 0
+
 running = True
 while running:
     clock.tick(60)
+    count += 1
+
     if not game_over:
+        if count % 50 == 0:
+            ran = random.choice([1, 1, 1, 2, 2, 3])
+            asteroids.append(Asteroid(ran))
+
         player.update_location()
         
         for bullet in player_bullets:
             bullet.move()
             if bullet.check_offscreen():
                player_bullets.pop(player_bullets.index(bullet))
+
+        for asteroid in asteroids:
+            asteroid.x += asteroid.x_velocity
+            asteroid.y += asteroid.y_velocity
 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
