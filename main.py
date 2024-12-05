@@ -186,6 +186,14 @@ while running:
             asteroid.x += asteroid.x_velocity
             asteroid.y += asteroid.y_velocity
 
+            for bullet in player_bullets:
+                if bullet.x >= asteroid.x and bullet.x <= asteroid.x + asteroid.width or \
+                   bullet.x + bullet.width >= asteroid.x and bullet.x + bullet.width <= asteroid.x + asteroid.width:
+                    if bullet.y >= asteroid.y and bullet.y <= asteroid.y + asteroid.height or \
+                       bullet.y + bullet.height >= asteroid.y and bullet.y + bullet.height <= asteroid.y + asteroid.height:
+                        asteroids.pop(asteroids.index(asteroid))
+                        player_bullets.pop(player_bullets.index(bullet))
+
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
             player.turn_left()
